@@ -1,0 +1,37 @@
+{
+  "name": "preset",
+  "version": "1.0.0",
+  "description": "Ein Preset für folgende Projekte, mit der standart Ordnerstruktur für Webpack.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "npx webpack serve",
+    "format": "npx prettier . --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Finn1962/Preset.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Finn1962/Preset/issues"
+  },
+  "homepage": "https://github.com/Finn1962/Preset#readme",
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.6",
+    "@eslint/js": "^9.39.2",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.2.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.4",
+    "jest": "^30.2.0",
+    "prettier": "3.8.1",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}
