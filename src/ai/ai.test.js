@@ -13,9 +13,37 @@ test("Ki trifft", () => {
   const player = new Player();
   player.gameboard.placeShip({
     length: 3,
-    position: { x: 0, y: 0 },
+    position: { x: 5, y: 5 },
     alignment: "x",
   });
-  ai.makeMove(player, { x: 0, y: 0 });
-  expect(ai.shipFound).toBe(true);
+  ai.takeAShot(player, { x: 5, y: 5 });
+  expect(ai.foundShip.hits.length).toBe(1);
+  ai.takeAShot(player);
+  expect(ai.foundShip.attemptsToFindNext).toBe(1);
+  ai.takeAShot(player);
+  expect(ai.foundShip.hits.length).toBe(2);
+  ai.takeAShot(player);
+  expect(player.gameboard.allShipsSunk()).toBe(true);
+});
+
+test("Ki trifft Test-2", () => {
+  const ai = new Ai();
+  const player = new Player();
+  player.gameboard.placeShip({
+    length: 4,
+    position: { x: 5, y: 5 },
+    alignment: "x",
+  });
+  ai.takeAShot(player, { x: 6, y: 5 });
+  expect(ai.foundShip.hits.length).toBe(1);
+  ai.takeAShot(player);
+  expect(ai.foundShip.attemptsToFindNext).toBe(1);
+  ai.takeAShot(player);
+  expect(ai.foundShip.hits.length).toBe(2);
+  ai.takeAShot(player);
+  expect(ai.foundShip.hits.length).toBe(3);
+  ai.takeAShot(player);
+  expect(ai.foundShip.hits.length).toBe(3);
+  ai.takeAShot(player);
+  expect(player.gameboard.allShipsSunk()).toBe(true);
 });
