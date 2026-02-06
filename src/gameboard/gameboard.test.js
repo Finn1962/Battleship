@@ -30,7 +30,7 @@ test("Schiff wird getroffen", () => {
     hit: true,
     shipIsSunk: false,
   });
-  expect(gameboard.receiveAttack({ x: 5, y: 5 })).toBe("already hit");
+  gameboard.receiveAttack({ x: 5, y: 5 });
   expect(gameboard.placedShips[0].isSunk()).toBe(false);
   gameboard.receiveAttack({ x: 6, y: 5 });
   gameboard.receiveAttack({ x: 5, y: 6 });
@@ -64,6 +64,6 @@ test("Alle Schiffe versenkt", () => {
   gameboard.receiveAttack({ x: 2, y: 0 });
   expect(gameboard.allShipsSunk()).toBe(false);
   gameboard.receiveAttack({ x: 5, y: 5 });
-  gameboard.receiveAttack({ x: 5, y: 6 });
+  gameboard.receiveAttack({ x: 5, y: 4 });
   expect(gameboard.allShipsSunk()).toBe(true);
 });

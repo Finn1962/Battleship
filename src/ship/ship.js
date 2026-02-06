@@ -26,7 +26,7 @@ export class Ship {
     } else {
       for (let i = 0; i < this.length; i++) {
         if (
-          this.position.y + i === coordinate.y &&
+          this.position.y - i === coordinate.y &&
           this.position.x === coordinate.x
         ) {
           return true;

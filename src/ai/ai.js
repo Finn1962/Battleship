@@ -45,13 +45,15 @@ export class Ai {
   }
 
   #findNextHit(enemy) {
-    if (this.foundShip.attemptsToFindNext >= 5)
-      throw new Error("Max attempts reached");
     const current = this.foundShip.hits[0];
     const nextX =
       current.x + this.possibleNextHits[this.foundShip.attemptsToFindNext].x;
     const nextY =
       current.y + this.possibleNextHits[this.foundShip.attemptsToFindNext].y;
+    if (!this.#nextShotIsValid({ x: nextX, y: nextY })) {
+      this.foundShip.attemptsToFindNext++;
+      return this.#findNextHit(enemy);
+    }
     const result = enemy.gameboard.receiveAttack({ x: nextX, y: nextY });
     if (result.shipIsSunk) {
       this.foundShip = false;
@@ -60,6 +62,8 @@ export class Ai {
         x: nextX,
         y: nextY,
       });
+      this.foundShip.alignment =
+        this.foundShip.hits[0].x === this.foundShip.hits[1].x ? "y" : "x";
     } else this.foundShip.attemptsToFindNext++;
     this.firedShots.push({ x: nextX, y: nextY });
   }
@@ -67,13 +71,15 @@ export class Ai {
   #findRemainingHits(enemy) {
     const offsetX = this.foundShip.searchOppositeEnd ? -1 : 1;
     const offsetY = this.foundShip.searchOppositeEnd ? 1 : -1;
-    const alignment =
-      this.foundShip.hits[0].x === this.foundShip.hits[1].x ? "y" : "x";
     const current = this.foundShip.searchOppositeEnd
       ? this.foundShip.hits[0]
       : this.foundShip.hits[this.foundShip.hits.length - 1];
-    const nextX = current.x + (alignment === "x" ? offsetX : 0);
-    const nextY = current.y + (alignment === "y" ? offsetY : 0);
+    const nextX = current.x + (this.foundShip.alignment === "x" ? offsetX : 0);
+    const nextY = current.y + (this.foundShip.alignment === "y" ? offsetY : 0);
+    if (!this.#nextShotIsValid({ x: nextX, y: nextY })) {
+      this.foundShip.searchOppositeEnd = true;
+      return this.#findRemainingHits(enemy);
+    }
     const result = enemy.gameboard.receiveAttack({ x: nextX, y: nextY });
     if (result.shipIsSunk) {
       this.foundShip = false;
@@ -81,5 +87,9 @@ export class Ai {
       this.foundShip.hits.push({ x: nextX, y: nextY });
     } else this.foundShip.searchOppositeEnd = true;
     this.firedShots.push({ x: nextX, y: nextY });
+  }
+
+  #nextShotIsValid(coord) {
+    return coord.x >= 0 && coord.x <= 9 && coord.y >= 0 && coord.y <= 9;
   }
 }
