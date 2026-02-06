@@ -1,5 +1,5 @@
-import { Gameboard } from "./gameboard/gameboard";
+import { Player } from "./player/player.js";
+import { Ai } from "./ai/ai.js";
 
-const gameboard = new Gameboard();
-
-gameboard.placeShip({ length: 4, position: { x: 5, y: 5 }, alignment: "x" });
+const ai = new Ai();
+const player = new Player();

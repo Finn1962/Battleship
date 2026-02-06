@@ -16,15 +16,16 @@ export class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    if (this.hitCoordinates.includes(this.#toString(coordinate))) return false;
+    if (this.hitCoordinates.includes(this.#toString(coordinate)))
+      return "already hit";
     for (const ship of this.placedShips) {
       if (ship.isHit(coordinate)) {
         ship.hit();
         this.hitCoordinates.push(this.#toString(coordinate));
-        return true;
+        return { hit: true, shipIsSunk: ship.isSunk() };
       }
     }
-    return false;
+    return { hit: false, shipIsSunk: false };
   }
 
   allShipsSunk() {
@@ -36,11 +37,9 @@ export class Gameboard {
   }
 
   #coordinateIsValid(shipData) {
-    return (
-      shipData.position.x + shipData.length <= 10 &&
-      shipData.position.x + shipData.length >= 0 &&
-      shipData.position.y - shipData.length >= 0 &&
-      shipData.position.y - shipData.length <= 9
-    );
+    if (shipData.alignment === "x")
+      return shipData.position.x + (shipData.length - 1) <= 9;
+    if (shipData.alignment === "y")
+      return shipData.position.y - (shipData.length - 1) >= 0;
   }
 }
