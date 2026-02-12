@@ -16,7 +16,7 @@ export class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    if (this.hitCoordinates.includes(this.#toString(coordinate))) return;
+    if (this.hitCoordinates.includes(this.#toString(coordinate))) return; //Hat irgendwas mit fehler zu tuhen
     for (const ship of this.placedShips) {
       if (ship.isHit(coordinate)) {
         ship.hit();

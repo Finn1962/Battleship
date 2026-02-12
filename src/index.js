@@ -5,8 +5,14 @@ const ai = new Ai();
 const player = new Player();
 player.gameboard.placeShip({
   length: 4,
-  position: { x: 1, y: 6 },
+  position: { x: 3, y: 3 },
   alignment: "y",
 });
-ai.takeAShot(player, { x: 1, y: 4 });
-console.log(ai.foundShip);
+ai.takeAShotAt(player, { x: 3, y: 2 });
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
+ai.takeAShotAt(player);
