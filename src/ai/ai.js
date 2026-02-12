@@ -2,13 +2,20 @@ import { Gameboard } from "../gameboard/gameboard";
 
 export class Ai {
   gameboard = new Gameboard();
-  usedCoords = [];
-  #foundShip = {
+  #boardSize = { min: 0, max: 9 };
+  usedCoords = new Set();
+  #targetMemory = {
     hitCoords: [],
     usedOffsets: [],
     reachedEndOfShip: false,
     alignment: null,
   };
+  #POSSIBLE_OFFSETS = Object.freeze([
+    { x: 0, y: +1 },
+    { x: +1, y: 0 },
+    { x: 0, y: -1 },
+    { x: -1, y: 0 },
+  ]);
   #STATES = Object.freeze({
     noPositionKnown: Symbol("noPositionKnown"),
     onePositionKnown: Symbol("onePositionKnown"),
@@ -42,29 +49,25 @@ export class Ai {
     },
   ) {
     const coordString = `${coord.x},${coord.y}`;
-    if (this.usedCoords.includes(coordString)) return this.#randomShotAt(enemy);
+    if (this.usedCoords.has(coordString)) return this.#randomShotAt(enemy);
     const result = enemy.gameboard.receiveAttack(coord);
     if (result.hit) {
-      this.#foundShip.hitCoords.push(coord);
+      this.#targetMemory.hitCoords.push(coord);
       this.#currentState = this.#STATES.onePositionKnown;
     }
-    this.usedCoords.push(coordString);
+    this.usedCoords.add(coordString);
   }
 
   #findNextHit(enemy) {
-    const possibleOffsets = [
-      { x: 0, y: +1 },
-      { x: +1, y: 0 },
-      { x: 0, y: -1 },
-      { x: -1, y: 0 },
-    ];
-    const randomIndex = Math.floor(Math.random() * possibleOffsets.length);
-    const offset = possibleOffsets[randomIndex];
+    const randomIndex = Math.floor(
+      Math.random() * this.#POSSIBLE_OFFSETS.length,
+    );
+    const offset = this.#POSSIBLE_OFFSETS[randomIndex];
     const offsetString = `${offset.x},${offset.y}`;
-    if (this.#foundShip.usedOffsets.includes(offsetString))
+    if (this.#targetMemory.usedOffsets.includes(offsetString))
       return this.#findNextHit(enemy);
-    this.#foundShip.usedOffsets.push(offsetString);
-    const lastHit = this.#foundShip.hitCoords[0];
+    this.#targetMemory.usedOffsets.push(offsetString);
+    const lastHit = this.#targetMemory.hitCoords[0];
     const nextXCoord = lastHit.x + offset.x;
     const nextYCoord = lastHit.y + offset.y;
     if (!this.#coordIsValid({ x: nextXCoord, y: nextYCoord }))
@@ -78,37 +81,35 @@ export class Ai {
     }
     if (result.hit) {
       this.#currentState = this.#STATES.moreThanOnePositionKnown;
-      this.#foundShip.hitCoords.push({
+      this.#targetMemory.hitCoords.push({
         x: nextXCoord,
         y: nextYCoord,
       });
-      const [firstCoord, secondCoord] = this.#foundShip.hitCoords;
-      if (firstCoord.x === secondCoord.x) this.#foundShip.alignment = "y";
-      else this.#foundShip.alignment = "x";
+      const [firstCoord, secondCoord] = this.#targetMemory.hitCoords;
+      if (firstCoord.x === secondCoord.x) this.#targetMemory.alignment = "y";
+      else this.#targetMemory.alignment = "x";
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.push(nextCoordString);
+    this.usedCoords.add(nextCoordString);
   }
 
   #findRemainingHits(enemy) {
-    let furthestKnownHit = this.#foundShip.hitCoords[0];
+    let furthestKnownHit = this.#targetMemory.hitCoords[0];
     let nextXCoord;
     let nextYCoord;
-    if (this.#foundShip.alignment === "x") {
-      for (const hit of this.#foundShip.hitCoords)
+    if (this.#targetMemory.alignment === "x") {
+      for (const hit of this.#targetMemory.hitCoords)
         if (furthestKnownHit.x < hit.x) furthestKnownHit = hit;
       nextXCoord = furthestKnownHit.x + 1;
       nextYCoord = furthestKnownHit.y;
     } else {
-      for (const hit of this.#foundShip.hitCoords)
+      for (const hit of this.#targetMemory.hitCoords)
         if (furthestKnownHit.y > hit.y) furthestKnownHit = hit;
       nextXCoord = furthestKnownHit.x;
       nextYCoord = furthestKnownHit.y - 1;
     }
     if (!this.#coordIsValid({ x: nextXCoord, y: nextYCoord })) {
       this.#currentState = this.#STATES.endOfShipReached;
-      const nextCoordString = `${nextXCoord},${nextYCoord}`;
-      this.usedCoords.push(nextCoordString);
       return;
     }
     const result = enemy.gameboard.receiveAttack({
@@ -118,7 +119,7 @@ export class Ai {
     if (result.shipIsSunk) {
       this.#resetState();
     } else if (result.hit) {
-      this.#foundShip.hitCoords.push({
+      this.#targetMemory.hitCoords.push({
         x: nextXCoord,
         y: nextYCoord,
       });
@@ -126,20 +127,20 @@ export class Ai {
       this.#currentState = this.#STATES.endOfShipReached;
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.push(nextCoordString);
+    this.usedCoords.add(nextCoordString);
   }
 
   #findRemainingHitsAtOtherSide(enemy) {
-    let furthestKnownHit = this.#foundShip.hitCoords[0];
+    let furthestKnownHit = this.#targetMemory.hitCoords[0];
     let nextXCoord;
     let nextYCoord;
-    if (this.#foundShip.alignment === "x") {
-      for (const hit of this.#foundShip.hitCoords)
+    if (this.#targetMemory.alignment === "x") {
+      for (const hit of this.#targetMemory.hitCoords)
         if (furthestKnownHit.x > hit.x) furthestKnownHit = hit;
       nextXCoord = furthestKnownHit.x - 1;
       nextYCoord = furthestKnownHit.y;
     } else {
-      for (const hit of this.#foundShip.hitCoords)
+      for (const hit of this.#targetMemory.hitCoords)
         if (furthestKnownHit.y < hit.y) furthestKnownHit = hit;
       nextXCoord = furthestKnownHit.x;
       nextYCoord = furthestKnownHit.y + 1;
@@ -151,7 +152,7 @@ export class Ai {
     if (result.shipIsSunk) {
       this.#resetState();
     } else if (result.hit) {
-      this.#foundShip.hitCoords.push({
+      this.#targetMemory.hitCoords.push({
         x: nextXCoord,
         y: nextYCoord,
       });
@@ -159,17 +160,22 @@ export class Ai {
       this.#currentState = this.#STATES.endOfShipReached;
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.push(nextCoordString);
+    this.usedCoords.add(nextCoordString);
   }
 
   #resetState() {
     this.#currentState = this.#STATES.noPositionKnown;
-    this.#foundShip.hitCoords = [];
-    this.#foundShip.usedOffsets = [];
-    this.#foundShip.alignment = null;
+    this.#targetMemory.hitCoords = [];
+    this.#targetMemory.usedOffsets = [];
+    this.#targetMemory.alignment = null;
   }
 
   #coordIsValid(coord) {
-    return coord.x >= 0 && coord.x <= 9 && coord.y >= 0 && coord.y <= 9;
+    return (
+      coord.x >= this.#boardSize.min &&
+      coord.x <= this.#boardSize.max &&
+      coord.y >= this.#boardSize.min &&
+      coord.y <= this.#boardSize.max
+    );
   }
 }
