@@ -73,8 +73,19 @@ export class Ai {
       x: nextXCoord,
       y: nextYCoord,
     });
-
-    this.#evaluateResults(result, nextXCoord, nextYCoord);
+    if (result.shipIsSunk) {
+      this.#resetState();
+    }
+    if (result.hit) {
+      this.#currentState = this.#STATES.moreThanOnePositionKnown;
+      this.#foundShip.hitCoords.push({
+        x: nextXCoord,
+        y: nextYCoord,
+      });
+      const [firstCoord, secondCoord] = this.#foundShip.hitCoords;
+      if (firstCoord.x === secondCoord.x) this.#foundShip.alignment = "y";
+      else this.#foundShip.alignment = "x";
+    }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
     this.usedCoords.push(nextCoordString);
   }
@@ -104,7 +115,16 @@ export class Ai {
       x: nextXCoord,
       y: nextYCoord,
     });
-    this.#evaluateResults(result, nextXCoord, nextYCoord);
+    if (result.shipIsSunk) {
+      this.#resetState();
+    } else if (result.hit) {
+      this.#foundShip.hitCoords.push({
+        x: nextXCoord,
+        y: nextYCoord,
+      });
+    } else {
+      this.#currentState = this.#STATES.endOfShipReached;
+    }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
     this.usedCoords.push(nextCoordString);
   }
@@ -128,29 +148,25 @@ export class Ai {
       x: nextXCoord,
       y: nextYCoord,
     });
-    this.#evaluateResults(result, nextXCoord, nextYCoord);
-    const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.push(nextCoordString);
-  }
-
-  #evaluateResults(result, nextXCoord, nextYCoord) {
     if (result.shipIsSunk) {
-      this.#currentState = this.#STATES.noPositionKnown;
-      this.#foundShip.hitCoords = [];
-      this.#foundShip.usedOffsets = [];
-      this.#foundShip.alignment = null;
+      this.#resetState();
     } else if (result.hit) {
-      this.#currentState = this.#STATES.moreThanOnePositionKnown;
       this.#foundShip.hitCoords.push({
         x: nextXCoord,
         y: nextYCoord,
       });
-      const [firstCoord, secondCoord] = this.#foundShip.hitCoords;
-      if (firstCoord.x === secondCoord.x) this.#foundShip.alignment = "y";
-      else this.#foundShip.alignment = "x";
     } else {
       this.#currentState = this.#STATES.endOfShipReached;
     }
+    const nextCoordString = `${nextXCoord},${nextYCoord}`;
+    this.usedCoords.push(nextCoordString);
+  }
+
+  #resetState() {
+    this.#currentState = this.#STATES.noPositionKnown;
+    this.#foundShip.hitCoords = [];
+    this.#foundShip.usedOffsets = [];
+    this.#foundShip.alignment = null;
   }
 
   #coordIsValid(coord) {
