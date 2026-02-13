@@ -2,7 +2,8 @@ import { Ship } from "../ship/ship.js";
 
 export class Gameboard {
   placedShips = [];
-  hitCoordinates = [];
+  reseivedHits = [];
+  remainingShips = 0;
 
   placeShip(shipData) {
     if (!this.#coordinateIsValid(shipData)) return;
@@ -16,11 +17,10 @@ export class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    if (this.hitCoordinates.includes(this.#toString(coordinate))) return; //Hat irgendwas mit fehler zu tuhen
+    this.reseivedHits.push(coordinate);
     for (const ship of this.placedShips) {
       if (ship.isHit(coordinate)) {
         ship.hit();
-        this.hitCoordinates.push(this.#toString(coordinate));
         return { hit: true, shipIsSunk: ship.isSunk() };
       }
     }
@@ -29,10 +29,6 @@ export class Gameboard {
 
   allShipsSunk() {
     return this.placedShips.every((ship) => ship.isSunk());
-  }
-
-  #toString(coordinate) {
-    return `${coordinate.x},${coordinate.y}`;
   }
 
   #coordinateIsValid(shipData) {

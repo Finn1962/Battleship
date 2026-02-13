@@ -44,8 +44,8 @@ export class Ai {
   #randomShotAt(
     enemy,
     coord = {
-      x: Math.floor(Math.random() * 9),
-      y: Math.floor(Math.random() * 9),
+      x: Math.floor(Math.random() * 10),
+      y: Math.floor(Math.random() * 10),
     },
   ) {
     const coordString = `${coord.x},${coord.y}`;
@@ -72,6 +72,7 @@ export class Ai {
     const nextYCoord = lastHit.y + offset.y;
     if (!this.#coordIsValid({ x: nextXCoord, y: nextYCoord }))
       return this.#findNextHit(enemy);
+    //Hier prüfen ob die Coordinaten an den Seiten schonmal getroffen wurden !!!!!!!
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,

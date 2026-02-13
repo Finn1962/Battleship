@@ -1,0 +1,209 @@
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Assistant:wght@200..800&display=swap");
+
+:root {
+  font-size: 18px;
+  --transition-speed: 1s;
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.shake {
+  animation: shake 0.3s;
+}
+
+body {
+  font-family: "assistant", sans-serif;
+  font-weight: 900;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+}
+
+.splash-screen-container {
+  animation: slideInFromTop var(--transition-speed);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding-bottom: 75px;
+}
+
+.logo {
+  animation: slideInFromTop var(--transition-speed);
+  transition: height var(--transition-speed);
+  height: 300px;
+  user-select: none;
+  z-index: 2;
+}
+
+input {
+  font: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  font-size: 1.5rem;
+  padding: 0 15px 0 15px;
+  margin: 75px 0 0 0;
+  width: 250px;
+  height: 50px;
+}
+
+input::placeholder {
+  color: #bbbbbb;
+  opacity: 1;
+}
+
+button {
+  transition: background-color 0.3s;
+  font: inherit;
+  border: none;
+  background-color: white;
+  color: #474747;
+  margin: 20px 0 0 0;
+  font-size: 1.5rem;
+  width: 200px;
+  height: 50px;
+}
+
+button:hover {
+  background-color: #d2d2d2;
+}
+
+.points-display {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: repeat(3, auto);
+  width: 200px;
+  margin: 25px 0 25px 0;
+}
+
+.points-display p:first-child {
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+  margin: 0 0 10px 0;
+  font-size: 2rem;
+  position: relative;
+}
+
+.points-display p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.game-container {
+  animation: slideInFromBottom var(--transition-speed);
+  display: none;
+  z-index: 2;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  column-gap: 50px;
+}
+
+.game-board {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #0051c2, #003379);
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  gap: 3px;
+  padding: 7px;
+}
+
+.playing-fields {
+  border: solid;
+  border-color: white;
+  border-width: 2px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.red-dot {
+  border-radius: 999px;
+  background-color: red;
+  width: 35%;
+  height: 35%;
+}
+
+.overlay {
+  animation: fadeOut var(--transition-speed);
+  transition: opacity var(--transition-speed);
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: black;
+  z-index: 1;
+}
+
+.background-image {
+  transition:
+    filter var(--transition-speed),
+    transform var(--transition-speed);
+  z-index: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}

@@ -5,5 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Battleship</title>
   </head>
-  <body></body>
+  <body>
+    <img src="./assets/Logo.svg" class="logo" id="logo" draggable="false" />
+
+    <div class="splash-screen-container" id="splash_screen_container">
+      <input type="text" id="input_user_name" placeholder="NAME" />
+      <button id="start_button">START GAME</button>
+    </div>
+
+    <div class="game-container" id="game_container">
+      <div class="points-display" id="points_display_player">
+        <p>YOU</p>
+        <p>REMAINING SHIPS:</p>
+        <p>0</p>
+        <p>SUNK SHIPS:</p>
+        <p>0</p>
+      </div>
+      <div class="points-display" id="points_display_ai">
+        <p>ENEMY</p>
+        <p>REMAINING SHIPS:</p>
+        <p>0</p>
+        <p>SUNK SHIPS:</p>
+        <p>0</p>
+      </div>
+      <div class="game-board" id="game_board_player"></div>
+      <div class="game-board" id="game_board_ai"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <img class="background-image" id="background_image" draggable="false" />
+  </body>
 </html>

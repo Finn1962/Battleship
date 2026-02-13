@@ -8,6 +8,17 @@ test("KI erstellen", () => {
   expect(ai.gameboard).toBeInstanceOf(Gameboard);
 });
 
+test("Ki hat verloren", () => {
+  const ai = new Ai();
+  expect(ai.gameboard.allShipsSunk()).toBe(true);
+  ai.gameboard.placeShip({
+    length: 6,
+    position: { x: 3, y: 5 },
+    alignment: "x",
+  });
+  expect(ai.gameboard.allShipsSunk()).toBe(false);
+});
+
 test("Ki trifft Test-1", () => {
   const ai = new Ai();
   const player = new Player();
@@ -18,7 +29,7 @@ test("Ki trifft Test-1", () => {
   });
   ai.takeAShotAt(player, { x: 6, y: 5 });
   for (let i = 0; i < 9; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
 
 test("Ki trifft Test-2", () => {
@@ -31,7 +42,7 @@ test("Ki trifft Test-2", () => {
   });
   ai.takeAShotAt(player, { x: 7, y: 2 });
   for (let i = 0; i < 7; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
 
 test("Ki trifft Test-3", () => {
@@ -44,7 +55,7 @@ test("Ki trifft Test-3", () => {
   });
   ai.takeAShotAt(player, { x: 9, y: 0 });
   for (let i = 0; i < 5; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
 
 test("Ki trifft Test-4", () => {
@@ -57,7 +68,7 @@ test("Ki trifft Test-4", () => {
   });
   ai.takeAShotAt(player, { x: 8, y: 9 });
   for (let i = 0; i < 6; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
 
 test("Ki trifft Test-5", () => {
@@ -70,7 +81,7 @@ test("Ki trifft Test-5", () => {
   });
   ai.takeAShotAt(player, { x: 3, y: 2 });
   for (let i = 0; i < 7; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
 
 test("Ki trifft Test-6", () => {
@@ -83,5 +94,31 @@ test("Ki trifft Test-6", () => {
   });
   ai.takeAShotAt(player, { x: 0, y: 3 });
   for (let i = 0; i < 7; i++) ai.takeAShotAt(player);
-  expect(player.gameboard.placedShips[0].isShipSunk).toBe(true);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
+});
+
+test("Ki trifft Test-7", () => {
+  const ai = new Ai();
+  const player = new Player();
+  player.gameboard.placeShip({
+    length: 3,
+    position: { x: 4, y: 5 },
+    alignment: "y",
+  });
+  ai.takeAShotAt(player, { x: 4, y: 4 });
+  for (let i = 0; i < 7; i++) ai.takeAShotAt(player);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
+});
+
+test("Ki trifft Test-8", () => {
+  const ai = new Ai();
+  const player = new Player();
+  player.gameboard.placeShip({
+    length: 4,
+    position: { x: 6, y: 1 },
+    alignment: "x",
+  });
+  ai.takeAShotAt(player, { x: 9, y: 1 });
+  for (let i = 0; i < 6; i++) ai.takeAShotAt(player);
+  expect(player.gameboard.placedShips[0].isSunk()).toBe(true);
 });
