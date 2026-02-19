@@ -2,8 +2,8 @@ import { Gameboard } from "../gameboard/gameboard";
 
 export class Ai {
   gameboard = new Gameboard();
-  #boardSize = { min: 0, max: 9 };
-  usedCoords = new Set();
+  role = "ai";
+  #usedCoords = new Set();
   #targetMemory = {
     hitCoords: [],
     usedOffsets: [],
@@ -49,13 +49,13 @@ export class Ai {
     },
   ) {
     const coordString = `${coord.x},${coord.y}`;
-    if (this.usedCoords.has(coordString)) return this.#randomShotAt(enemy);
+    if (this.#usedCoords.has(coordString)) return this.#randomShotAt(enemy);
     const result = enemy.gameboard.receiveAttack(coord);
     if (result.hit) {
       this.#targetMemory.hitCoords.push(coord);
       this.#currentState = this.#STATES.onePositionKnown;
     }
-    this.usedCoords.add(coordString);
+    this.#usedCoords.add(coordString);
   }
 
   #findNextHit(enemy) {
@@ -91,7 +91,7 @@ export class Ai {
       else this.#targetMemory.alignment = "x";
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.add(nextCoordString);
+    this.#usedCoords.add(nextCoordString);
   }
 
   #findRemainingHits(enemy) {
@@ -128,7 +128,7 @@ export class Ai {
       this.#currentState = this.#STATES.endOfShipReached;
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.add(nextCoordString);
+    this.#usedCoords.add(nextCoordString);
   }
 
   #findRemainingHitsAtOtherSide(enemy) {
@@ -161,7 +161,7 @@ export class Ai {
       this.#currentState = this.#STATES.endOfShipReached;
     }
     const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.usedCoords.add(nextCoordString);
+    this.#usedCoords.add(nextCoordString);
   }
 
   #resetState() {
@@ -172,11 +172,12 @@ export class Ai {
   }
 
   #coordIsValid(coord) {
+    const boardSize = { min: 0, max: 9 };
     return (
-      coord.x >= this.#boardSize.min &&
-      coord.x <= this.#boardSize.max &&
-      coord.y >= this.#boardSize.min &&
-      coord.y <= this.#boardSize.max
+      coord.x >= boardSize.min &&
+      coord.x <= boardSize.max &&
+      coord.y >= boardSize.min &&
+      coord.y <= boardSize.max
     );
   }
 }

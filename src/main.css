@@ -156,7 +156,7 @@ button:hover {
 .game-board {
   width: 450px;
   height: 450px;
-  background: radial-gradient(circle, #0051c2, #003379);
+  background: radial-gradient(circle, #006aff, #00347d);
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
@@ -172,6 +172,13 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.white-dot {
+  border-radius: 999px;
+  background-color: rgb(255, 255, 255);
+  width: 35%;
+  height: 35%;
 }
 
 .red-dot {

@@ -3,7 +3,7 @@ export class Ship {
     this.hits = 0;
     this.isShipSunk = false;
     this.length = length;
-    this.position = position;
+    this.coord = position;
     this.alignment = alignment;
   }
 
@@ -13,22 +13,16 @@ export class Ship {
     if (this.length === this.hits) this.isShipSunk = true;
   }
 
-  isHit(coordinate) {
+  isHit(hitCoord) {
     if (this.alignment === "x") {
       for (let i = 0; i < this.length; i++) {
-        if (
-          this.position.x + i === coordinate.x &&
-          this.position.y === coordinate.y
-        ) {
+        if (this.coord.x + i === hitCoord.x && this.coord.y === hitCoord.y) {
           return true;
         }
       }
     } else {
       for (let i = 0; i < this.length; i++) {
-        if (
-          this.position.y - i === coordinate.y &&
-          this.position.x === coordinate.x
-        ) {
+        if (this.coord.y - i === hitCoord.y && this.coord.x === hitCoord.x) {
           return true;
         }
       }

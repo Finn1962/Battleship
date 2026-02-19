@@ -1,14 +1,30 @@
 import { Gameboard } from "../gameboard/gameboard";
+import { hovered } from "../DOMController/hovered-field-tracker.js";
 
 export class Player {
-  usedCoords = new Set();
+  #usedCoords = new Set();
   gameboard = new Gameboard();
+  role = "player";
 
   constructor(name) {
     this.name = name;
   }
 
-  takeAShotAt(enemy, coordinates) {
-    enemy.gameboard.receiveAttack(coordinates);
+  takeAShotAt(enemy, coord) {
+    if (this.#usedCoords.has(`${coord.x},${coord.y}`)) return false;
+    enemy.gameboard.receiveAttack(coord);
+    this.#usedCoords.add(`${coord.x},${coord.y}`);
+    return true;
+  }
+
+  aimedCoord() {
+    return new Promise((resolve) => {
+      function handler() {
+        if (hovered.coordAi.x === null || hovered.coordAi.y === null) return;
+        document.removeEventListener("click", handler);
+        resolve(hovered.coordAi);
+      }
+      document.addEventListener("click", handler);
+    });
   }
 }

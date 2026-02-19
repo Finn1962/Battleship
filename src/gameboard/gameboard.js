@@ -6,7 +6,6 @@ export class Gameboard {
   remainingShips = 0;
 
   placeShip(shipData) {
-    if (!this.#coordinateIsValid(shipData)) return;
     const ship = new Ship(
       shipData.length,
       shipData.position,
@@ -17,13 +16,14 @@ export class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    this.reseivedHits.push(coordinate);
     for (const ship of this.placedShips) {
       if (ship.isHit(coordinate)) {
+        this.reseivedHits.push({ coord: coordinate, isShipHit: true });
         ship.hit();
         return { hit: true, shipIsSunk: ship.isSunk() };
       }
     }
+    this.reseivedHits.push({ coord: coordinate, isShipHit: false });
     return { hit: false, shipIsSunk: false };
   }
 
@@ -31,7 +31,28 @@ export class Gameboard {
     return this.placedShips.every((ship) => ship.isSunk());
   }
 
-  #coordinateIsValid(shipData) {
+  coordIsCollsionFree(shipData) {
+    for (const ship of this.placedShips) {
+      if (shipData.alignment === "x") {
+        for (let i = 0; i < shipData.length; i++) {
+          if (
+            ship.isHit({ x: shipData.position.x + 1, y: shipData.position.y })
+          )
+            return false;
+        }
+      } else {
+        for (let i = 0; i < shipData.length; i++) {
+          if (
+            ship.isHit({ x: shipData.position.x, y: shipData.position.y - 1 })
+          )
+            return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  coordinateIsValid(shipData) {
     if (shipData.alignment === "x")
       return shipData.position.x + (shipData.length - 1) <= 9;
     if (shipData.alignment === "y")
