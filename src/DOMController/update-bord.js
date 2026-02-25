@@ -12,11 +12,10 @@ export class Dom {
   };
   internalPlayer = null;
 
-  static colorHoveredFields(shipLength, alignment, color) {
+  static colorHoveredFields(shipLength, alignment) {
     this.#mouseOverData.active = true;
     this.#mouseOverData.shipLength = shipLength;
     this.#mouseOverData.alignment = alignment;
-    this.#mouseOverData.color = color;
   }
 
   static stopColorFields() {
@@ -25,11 +24,9 @@ export class Dom {
 
   static initMouseOverHandler() {
     const uiBoardPlayer = document.getElementById("game_board_player");
-    uiBoardPlayer.addEventListener("mouseover", () => {
-      if (this.#hoveredCoordIsValid())
-        this.#mouseOverHandler(uiBoardPlayer, this.#mouseOverData.color);
-      else this.#mouseOverHandler(uiBoardPlayer, "red");
-    });
+    uiBoardPlayer.addEventListener("mouseover", () =>
+      this.#mouseOverHandler(uiBoardPlayer, "white"),
+    );
     uiBoardPlayer.addEventListener("mouseout", () =>
       this.#mouseOverHandler(uiBoardPlayer, "transparent"),
     );
@@ -37,11 +34,15 @@ export class Dom {
 
   static #mouseOverHandler = (uiBoardPlayer, color) => {
     if (!this.#mouseOverData.active) return;
+    const { x: xCoord, y: yCoord } = hovered.coordPlayer;
+    if (!this.#hoveredCoordIsValid({ x: xCoord, y: yCoord })) return;
     const shipLength = this.#mouseOverData.shipLength;
-    if (this.#mouseOverData.alignment === "x") {
+    const alignment = this.#mouseOverData.alignment;
+
+    if (alignment === "x") {
       for (let i = 0; i < shipLength; i++) {
         const uiField = uiBoardPlayer.querySelector(
-          `[data-x="${hovered.coordPlayer.x + i}"][data-y="${hovered.coordPlayer.y}"]`,
+          `[data-x="${xCoord + i}"][data-y="${yCoord}"]`,
         );
         if (uiField) uiField.style.backgroundColor = color;
       }
@@ -111,7 +112,7 @@ export class Dom {
     const internalBoard = this.internalPlayer.gameboard;
     const { x: xCoord, y: yCoord } = hovered.coordPlayer;
     for (const ship of internalBoard.placedShips) {
-      for (let i = 0; i < ship.length; i++) {
+      for (let i = 0; i < ship.length - 1; i++) {
         xOffset = alignment === "x" ? i : 0;
         yOffset = alignment === "y" ? i : 0;
         if (ship.isHit({ x: xCoord + xOffset, y: yCoord - yOffset })) {

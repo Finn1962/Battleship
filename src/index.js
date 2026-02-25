@@ -79,7 +79,7 @@ DOM_ELEMENTS.alignmentButton.addEventListener("click", () => {
 DOM_ELEMENTS.startButton.addEventListener("click", async () => {
   if (currentState !== STATES.playerPlacesShips) return;
   for (const length of usableShipLengths) {
-    Dom.colorHoveredFields(length, currentAlignment, "white");
+    Dom.colorHoveredFields(length, currentAlignment);
     let shipPlaced = false;
     while (!shipPlaced) {
       await waitForClick();
