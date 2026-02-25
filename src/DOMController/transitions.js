@@ -5,12 +5,27 @@ const splashScreenContainer = document.getElementById(
 const gameContainer = document.getElementById("game_container");
 const backgroundImage = document.getElementById("background_image");
 const overlay = document.getElementById("overlay");
+const aiBoard = document.getElementById("game_board_ai");
+const pointsDisplays = gameContainer.querySelectorAll(".points-display");
+const alignmentButton = document.getElementById("alignment_button");
 
-export function transitionStartGame() {
-  logo.style.height = "150px";
-  splashScreenContainer.style.display = "none";
-  gameContainer.style.display = "grid";
-  backgroundImage.style.filter = "blur(15px)";
-  backgroundImage.style.transform = "scale(1.2)";
-  overlay.style.opacity = "0.5";
+export class Transitions {
+  static placeShips() {
+    alignmentButton.style.display = "block";
+    logo.style.height = "150px";
+    splashScreenContainer.style.display = "none";
+    gameContainer.style.display = "grid";
+    backgroundImage.style.filter = "blur(15px)";
+    backgroundImage.style.transform = "scale(1.2)";
+    overlay.style.opacity = "0.5";
+  }
+
+  static startGame() {
+    alignmentButton.style.display = "none";
+    aiBoard.style.display = "grid";
+    gameContainer.style.columnGap = "50px";
+    pointsDisplays.forEach((pointsDisplay) => {
+      pointsDisplay.style.display = "block";
+    });
+  }
 }

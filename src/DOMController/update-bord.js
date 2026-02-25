@@ -1,42 +1,124 @@
 //interngameboard steht für die Interne Logig
 //uiGameBoard steht für das Domgameboard
 
-export function updateBoard(opponent) {
-  const internalBoard = opponent.gameboard;
-  const uiGameBoard =
-    opponent.role === "player"
-      ? document.getElementById("game_board_player")
-      : document.getElementById("game_board_ai");
+import { hovered } from "./hovered-field-tracker.js";
 
-  for (const hit of internalBoard.reseivedHits) {
-    const dot = document.createElement("div");
-    if (hit.isShipHit) dot.classList.add("red-dot");
-    dot.classList.add("white-dot");
-    const uiField = uiGameBoard.querySelector(
-      `[data-x="${hit.coord.x}"][data-y="${hit.coord.y}"]`,
-    );
-    uiField.replaceChildren();
-    uiField.append(dot);
+export class Dom {
+  static #mouseOverData = {
+    active: false,
+    shipLength: null,
+    alignment: null,
+    color: null,
+  };
+  internalPlayer = null;
+
+  static colorHoveredFields(shipLength, alignment, color) {
+    this.#mouseOverData.active = true;
+    this.#mouseOverData.shipLength = shipLength;
+    this.#mouseOverData.alignment = alignment;
+    this.#mouseOverData.color = color;
   }
-  for (const ship of internalBoard.placedShips) {
-    if (ship.alignment === "x") {
-      for (let i = 0; i < ship.length; i++) {
-        const uiField = uiGameBoard.querySelector(
-          `[data-x="${ship.coord.x + i}"][data-y="${ship.coord.y}"]`,
+
+  static stopColorFields() {
+    this.#mouseOverData.active = false;
+  }
+
+  static initMouseOverHandler() {
+    const uiBoardPlayer = document.getElementById("game_board_player");
+    uiBoardPlayer.addEventListener("mouseover", () => {
+      if (this.#hoveredCoordIsValid())
+        this.#mouseOverHandler(uiBoardPlayer, this.#mouseOverData.color);
+      else this.#mouseOverHandler(uiBoardPlayer, "red");
+    });
+    uiBoardPlayer.addEventListener("mouseout", () =>
+      this.#mouseOverHandler(uiBoardPlayer, "transparent"),
+    );
+  }
+
+  static #mouseOverHandler = (uiBoardPlayer, color) => {
+    if (!this.#mouseOverData.active) return;
+    const shipLength = this.#mouseOverData.shipLength;
+    if (this.#mouseOverData.alignment === "x") {
+      for (let i = 0; i < shipLength; i++) {
+        const uiField = uiBoardPlayer.querySelector(
+          `[data-x="${hovered.coordPlayer.x + i}"][data-y="${hovered.coordPlayer.y}"]`,
         );
-        if (ship.isSunk()) uiField.style.backgroundColor = "Silver";
-        else if (opponent.role === "player")
-          uiField.style.backgroundColor = "white";
+        if (uiField) uiField.style.backgroundColor = color;
       }
     } else {
-      for (let i = 0; i < ship.length; i++) {
-        const uiField = uiGameBoard.querySelector(
-          `[data-x="${ship.coord.x}"][data-y="${ship.coord.y - i}"]`,
+      for (let i = 0; i < shipLength; i++) {
+        const uiField = uiBoardPlayer.querySelector(
+          `[data-x="${hovered.coordPlayer.x}"][data-y="${hovered.coordPlayer.y - i}"]`,
         );
-        if (ship.isSunk()) uiField.style.backgroundColor = "Silver";
-        else if (opponent.role === "player")
-          uiField.style.backgroundColor = "white";
+        if (uiField) uiField.style.backgroundColor = color;
       }
     }
+  };
+
+  static updateBoard(opponent) {
+    const internalBoard = opponent.gameboard;
+    const uiGameBoard =
+      opponent.role === "player"
+        ? document.getElementById("game_board_player")
+        : document.getElementById("game_board_ai");
+
+    for (const hit of internalBoard.reseivedHits) {
+      const dot = document.createElement("div");
+      if (hit.isShipHit) dot.classList.add("red-dot");
+      dot.classList.add("white-dot");
+      const uiField = uiGameBoard.querySelector(
+        `[data-x="${hit.coord.x}"][data-y="${hit.coord.y}"]`,
+      );
+      uiField.replaceChildren();
+      uiField.append(dot);
+    }
+    for (const ship of internalBoard.placedShips) {
+      if (ship.alignment === "x") {
+        for (let i = 0; i < ship.length; i++) {
+          const uiField = uiGameBoard.querySelector(
+            `[data-x="${ship.coord.x + i}"][data-y="${ship.coord.y}"]`,
+          );
+          if (ship.isSunk()) uiField.style.backgroundColor = "Silver";
+          else if (opponent.role === "player")
+            uiField.style.backgroundColor = "white";
+        }
+      } else {
+        for (let i = 0; i < ship.length; i++) {
+          const uiField = uiGameBoard.querySelector(
+            `[data-x="${ship.coord.x}"][data-y="${ship.coord.y - i}"]`,
+          );
+          if (ship.isSunk()) uiField.style.backgroundColor = "Silver";
+          else if (opponent.role === "player")
+            uiField.style.backgroundColor = "white";
+        }
+      }
+    }
+  }
+
+  static #hoveredCoordIsValid() {
+    let isWithInBorders = true;
+    let noShipCollisions = true;
+    const { alignment, shipLength } = this.#mouseOverData;
+    let xOffset = alignment === "x" ? shipLength - 1 : 0;
+    let yOffset = alignment === "y" ? shipLength - 1 : 0;
+    const boardSize = { min: 0, max: 9 };
+    if (
+      hovered.coordPlayer.x + xOffset > boardSize.max ||
+      hovered.coordPlayer.y - yOffset < boardSize.min
+    )
+      isWithInBorders = false;
+
+    const internalBoard = this.internalPlayer.gameboard;
+    const { x: xCoord, y: yCoord } = hovered.coordPlayer;
+    for (const ship of internalBoard.placedShips) {
+      for (let i = 0; i < ship.length; i++) {
+        xOffset = alignment === "x" ? i : 0;
+        yOffset = alignment === "y" ? i : 0;
+        if (ship.isHit({ x: xCoord + xOffset, y: yCoord - yOffset })) {
+          noShipCollisions = false;
+        }
+      }
+    }
+    return isWithInBorders && noShipCollisions;
   }
 }

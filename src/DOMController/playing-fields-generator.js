@@ -1,7 +1,7 @@
 const uiBoardPlayer = document.getElementById("game_board_player");
 const uiBoardAi = document.getElementById("game_board_ai");
 
-export function initBoradInDom() {
+export function initFieldsInDom() {
   initFields(uiBoardPlayer);
   initFields(uiBoardAi);
 }

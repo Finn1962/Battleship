@@ -1,7 +1,7 @@
 export const hovered = {
-  fieldPlayer: null,
+  uiFieldPlayer: null,
   coordPlayer: { x: null, y: null },
-  fieldAi: null,
+  uiFieldAi: null,
   coordAi: { x: null, y: null },
 };
 
@@ -10,26 +10,30 @@ export function initHoverTracker() {
   const aiBoard = document.getElementById("game_board_ai");
 
   playerBoard.addEventListener("mouseover", (event) => {
-    hovered.fieldPlayer = event.target;
-    const xCoord = Number(hovered.fieldPlayer.getAttribute("data-x"));
-    const yCoord = Number(hovered.fieldPlayer.getAttribute("data-y"));
+    const uiField = event.target.closest("[data-x][data-y]");
+    if (!uiField) return;
+    hovered.uiFieldPlayer = uiField;
+    const xCoord = Number(uiField.getAttribute("data-x"));
+    const yCoord = Number(uiField.getAttribute("data-y"));
     hovered.coordPlayer = { x: xCoord, y: yCoord };
   });
 
-  playerBoard.addEventListener("mouseleave", () => {
-    hovered.fieldPlayer = null;
+  /*playerBoard.addEventListener("mouseleave", () => {
+    hovered.uiFieldPlayer = null;
     hovered.coordPlayer = { x: null, y: null };
-  });
+  });*/
 
   aiBoard.addEventListener("mouseover", (event) => {
-    hovered.fieldAi = event.target;
-    const xCoord = Number(hovered.fieldAi.getAttribute("data-x"));
-    const yCoord = Number(hovered.fieldAi.getAttribute("data-y"));
+    const uiField = event.target.closest("[data-x][data-y]");
+    if (!uiField) return;
+    hovered.uiFieldAi = uiField;
+    const xCoord = Number(uiField.getAttribute("data-x"));
+    const yCoord = Number(uiField.getAttribute("data-y"));
     hovered.coordAi = { x: xCoord, y: yCoord };
   });
 
-  aiBoard.addEventListener("mouseleave", () => {
-    hovered.fieldAi = null;
+  /*aiBoard.addEventListener("mouseleave", () => {
+    hovered.uiFieldAi = null;
     hovered.coordAi = { x: null, y: null };
-  });
+  });*/
 }
