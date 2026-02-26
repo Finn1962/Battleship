@@ -1,5 +1,4 @@
 import { hovered } from "./hovered-field-tracker.js";
-import { Gameboard } from "../gameboard.js";
 
 export class Dom {
   static #mouseOverData = {
@@ -86,7 +85,6 @@ export class Dom {
       opponent.role === "player"
         ? document.getElementById("game_board_player")
         : document.getElementById("game_board_ai");
-
     for (const hit of internalBoard.reseivedHits) {
       const dot = document.createElement("div");
       if (hit.isShipHit) dot.classList.add("red-dot");
