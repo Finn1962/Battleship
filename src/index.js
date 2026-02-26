@@ -116,7 +116,7 @@ document.addEventListener("startGame", async () => {
     Dom.updateBoard(ai);
     if (ai.gameboard.allShipsSunk()) break;
     ai.takeAShotAt(player);
-    await wait(250);
+    await wait(500);
     Dom.updateBoard(player);
     if (player.gameboard.allShipsSunk()) {
       break;

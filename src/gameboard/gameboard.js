@@ -36,14 +36,14 @@ export class Gameboard {
       if (shipData.alignment === "x") {
         for (let i = 0; i < shipData.length; i++) {
           if (
-            ship.isHit({ x: shipData.position.x + 1, y: shipData.position.y })
+            ship.isHit({ x: shipData.position.x + i, y: shipData.position.y })
           )
             return false;
         }
       } else {
         for (let i = 0; i < shipData.length; i++) {
           if (
-            ship.isHit({ x: shipData.position.x, y: shipData.position.y - 1 })
+            ship.isHit({ x: shipData.position.x, y: shipData.position.y - i })
           )
             return false;
         }

@@ -3,6 +3,8 @@ import { Gameboard } from "../gameboard/gameboard";
 export class Ai {
   gameboard = new Gameboard();
   role = "ai";
+  remainingShips;
+  sunkShips;
   #usedCoords = new Set();
   #targetMemory = {
     hitCoords: [],

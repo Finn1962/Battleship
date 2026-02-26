@@ -2,13 +2,12 @@ import { Gameboard } from "../gameboard/gameboard";
 import { hovered } from "../DOMController/hovered-field-tracker.js";
 
 export class Player {
+  name;
   #usedCoords = new Set();
   gameboard = new Gameboard();
+  remainingShips;
+  sunkShips;
   role = "player";
-
-  constructor(name) {
-    this.name = name;
-  }
 
   takeAShotAt(enemy, coord) {
     if (this.#usedCoords.has(`${coord.x},${coord.y}`)) return false;

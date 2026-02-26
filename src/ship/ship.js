@@ -1,7 +1,8 @@
 export class Ship {
+  hits = 0;
+  isShipSunk = false;
+
   constructor(length, position, alignment) {
-    this.hits = 0;
-    this.isShipSunk = false;
     this.length = length;
     this.coord = position;
     this.alignment = alignment;

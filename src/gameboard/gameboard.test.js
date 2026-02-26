@@ -55,9 +55,9 @@ test("Kolision", () => {
   ).toBe(true);
   expect(
     gameboard.coordIsCollsionFree({
-      length: 4,
-      position: { x: 4, y: 5 },
-      alignment: "x",
+      length: 5,
+      position: { x: 6, y: 9 },
+      alignment: "y",
     }),
   ).toBe(false);
 });

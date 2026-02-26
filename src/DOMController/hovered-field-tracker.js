@@ -18,10 +18,10 @@ export function initHoverTracker() {
     hovered.coordPlayer = { x: xCoord, y: yCoord };
   });
 
-  /*playerBoard.addEventListener("mouseleave", () => {
+  playerBoard.addEventListener("mouseleave", () => {
     hovered.uiFieldPlayer = null;
     hovered.coordPlayer = { x: null, y: null };
-  });*/
+  });
 
   aiBoard.addEventListener("mouseover", (event) => {
     const uiField = event.target.closest("[data-x][data-y]");
@@ -32,8 +32,8 @@ export function initHoverTracker() {
     hovered.coordAi = { x: xCoord, y: yCoord };
   });
 
-  /*aiBoard.addEventListener("mouseleave", () => {
+  aiBoard.addEventListener("mouseleave", () => {
     hovered.uiFieldAi = null;
     hovered.coordAi = { x: null, y: null };
-  });*/
+  });
 }

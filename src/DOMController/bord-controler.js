@@ -1,22 +1,22 @@
 import { hovered } from "./hovered-field-tracker.js";
+import { Gameboard } from "../gameboard.js";
 
 export class Dom {
   static #mouseOverData = {
-    active: false,
+    coloringActive: false,
     shipLength: null,
     alignment: null,
-    color: null,
   };
-  internalPlayer = null;
+  internalPlayer = null; //Wird später in Index zugewiesen sobald erstellt
 
   static colorHoveredFields(shipLength, alignment) {
-    this.#mouseOverData.active = true;
+    this.#mouseOverData.coloringActive = true;
     this.#mouseOverData.shipLength = shipLength;
     this.#mouseOverData.alignment = alignment;
   }
 
   static stopColorFields() {
-    this.#mouseOverData.active = false;
+    this.#mouseOverData.coloringActive = false;
   }
 
   static initMouseOverHandler() {
@@ -30,7 +30,7 @@ export class Dom {
   }
 
   static #mouseOverHandler = (uiBoardPlayer, color) => {
-    if (!this.#mouseOverData.active) return;
+    if (!this.#mouseOverData.coloringActive) return;
     const { x: xCoord, y: yCoord } = hovered.coordPlayer;
     if (!this.#hoveredCoordIsValid({ x: xCoord, y: yCoord })) return;
     const shipLength = this.#mouseOverData.shipLength;
@@ -54,7 +54,7 @@ export class Dom {
   };
 
   static #hoveredCoordIsValid() {
-    let isWithInBorders = true;
+    let isWithInGameboard = true;
     let noShipCollisions = true;
     const { alignment, shipLength } = this.#mouseOverData;
     let xOffset = alignment === "x" ? shipLength - 1 : 0;
@@ -64,7 +64,7 @@ export class Dom {
       hovered.coordPlayer.x + xOffset > boardSize.max ||
       hovered.coordPlayer.y - yOffset < boardSize.min
     )
-      isWithInBorders = false;
+      isWithInGameboard = false;
 
     const internalBoard = this.internalPlayer.gameboard;
     const { x: xCoord, y: yCoord } = hovered.coordPlayer;
@@ -77,7 +77,7 @@ export class Dom {
         }
       }
     }
-    return isWithInBorders && noShipCollisions;
+    return isWithInGameboard && noShipCollisions;
   }
 
   static updateBoard(opponent) {
