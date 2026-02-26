@@ -3,7 +3,7 @@ import { Player } from "./player/player.js";
 import { Ai } from "./ai/ai.js";
 import { Transitions } from "./DOMController/transitions.js";
 import { initFieldsInDom } from "./DOMController/playing-fields-generator.js";
-import { Dom } from "./DOMController/update-bord.js";
+import { Dom } from "./DOMController/bord-controler.js";
 import { initHoverTracker } from "./DOMController/hovered-field-tracker.js";
 import { hovered } from "./DOMController/hovered-field-tracker.js";
 
@@ -15,21 +15,20 @@ const DOM_ELEMENTS = Object.freeze({
   inputUserName: document.getElementById("input_user_name"),
   uiBoardPlayer: document.getElementById("game_board_player"),
 });
-const STATES = Object.freeze({
-  playerPlacesShips: Symbol("playerPlacesShips"),
-});
-let currentState;
 let currentAlignment = "x";
 const usableShipLengths = Object.freeze([5, 4, 3, 3, 2]);
+let currentShipLength;
 const ai = new Ai();
 const player = new Player();
-Dom.internalPlayer = player; //Zum anzeigen von Kolisionen beim Platzieren
+Dom.internalPlayer = player; //Zum anzeigen von Kolisionen beim Platzieren von Schiffen benötigt
 
 const wait = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 const waitForClick = () =>
   new Promise((resolve) =>
     DOM_ELEMENTS.uiBoardPlayer.addEventListener("click", () => resolve()),
   );
+
+const startGame = new CustomEvent("startGame");
 
 //Schiffe für Ai platzieren
 for (const length of usableShipLengths) {
@@ -66,19 +65,19 @@ DOM_ELEMENTS.startButton.addEventListener("click", () => {
   initFieldsInDom();
   initHoverTracker();
   Dom.initMouseOverHandler();
-  currentState = STATES.playerPlacesShips;
 });
 
 //Bei Klick auf alignmentbutton ausrichtung ändern
 DOM_ELEMENTS.alignmentButton.addEventListener("click", () => {
   if (currentAlignment === "x") currentAlignment = "y";
   else currentAlignment = "x";
+  Dom.colorHoveredFields(currentShipLength, currentAlignment);
 });
 
-//Bei Klick wird Schiff platziert
+//Schiffe für Spieler platzieren
 DOM_ELEMENTS.startButton.addEventListener("click", async () => {
-  if (currentState !== STATES.playerPlacesShips) return;
   for (const length of usableShipLengths) {
+    currentShipLength = length;
     Dom.colorHoveredFields(length, currentAlignment);
     let shipPlaced = false;
     while (!shipPlaced) {
@@ -98,15 +97,17 @@ DOM_ELEMENTS.startButton.addEventListener("click", async () => {
     }
     Dom.updateBoard(player);
   }
+  Dom.stopColorFields();
+  document.dispatchEvent(startGame);
 });
 
-/*
-initBoradInDom();
-updateBoard(player);
-*/
+//Übergang zum Spiel
+document.addEventListener("startGame", () => {
+  Transitions.startGame();
+});
 
-/*
-DOM_ELEMENTS.startButton.addEventListener("click", async () => {
+//Ablauf während des Spieles
+document.addEventListener("startGame", async () => {
   while (true) {
     let shotIsValid = false;
     while (!shotIsValid) {
@@ -122,4 +123,3 @@ DOM_ELEMENTS.startButton.addEventListener("click", async () => {
     }
   }
 });
-*/

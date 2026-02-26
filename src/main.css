@@ -163,6 +163,7 @@ button:hover {
 }
 
 .game-board {
+  animation: slideInFromBottom var(--transition-speed);
   width: 450px;
   height: 450px;
   background: radial-gradient(circle, #006aff, #00347d);

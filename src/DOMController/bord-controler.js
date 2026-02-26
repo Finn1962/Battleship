@@ -1,6 +1,3 @@
-//interngameboard steht für die Interne Logig
-//uiGameBoard steht für das Domgameboard
-
 import { hovered } from "./hovered-field-tracker.js";
 
 export class Dom {
@@ -56,6 +53,33 @@ export class Dom {
     }
   };
 
+  static #hoveredCoordIsValid() {
+    let isWithInBorders = true;
+    let noShipCollisions = true;
+    const { alignment, shipLength } = this.#mouseOverData;
+    let xOffset = alignment === "x" ? shipLength - 1 : 0;
+    let yOffset = alignment === "y" ? shipLength - 1 : 0;
+    const boardSize = { min: 0, max: 9 };
+    if (
+      hovered.coordPlayer.x + xOffset > boardSize.max ||
+      hovered.coordPlayer.y - yOffset < boardSize.min
+    )
+      isWithInBorders = false;
+
+    const internalBoard = this.internalPlayer.gameboard;
+    const { x: xCoord, y: yCoord } = hovered.coordPlayer;
+    for (const ship of internalBoard.placedShips) {
+      for (let i = 0; i < ship.length - 1; i++) {
+        xOffset = alignment === "x" ? i : 0;
+        yOffset = alignment === "y" ? i : 0;
+        if (ship.isHit({ x: xCoord + xOffset, y: yCoord - yOffset })) {
+          noShipCollisions = false;
+        }
+      }
+    }
+    return isWithInBorders && noShipCollisions;
+  }
+
   static updateBoard(opponent) {
     const internalBoard = opponent.gameboard;
     const uiGameBoard =
@@ -94,32 +118,5 @@ export class Dom {
         }
       }
     }
-  }
-
-  static #hoveredCoordIsValid() {
-    let isWithInBorders = true;
-    let noShipCollisions = true;
-    const { alignment, shipLength } = this.#mouseOverData;
-    let xOffset = alignment === "x" ? shipLength - 1 : 0;
-    let yOffset = alignment === "y" ? shipLength - 1 : 0;
-    const boardSize = { min: 0, max: 9 };
-    if (
-      hovered.coordPlayer.x + xOffset > boardSize.max ||
-      hovered.coordPlayer.y - yOffset < boardSize.min
-    )
-      isWithInBorders = false;
-
-    const internalBoard = this.internalPlayer.gameboard;
-    const { x: xCoord, y: yCoord } = hovered.coordPlayer;
-    for (const ship of internalBoard.placedShips) {
-      for (let i = 0; i < ship.length - 1; i++) {
-        xOffset = alignment === "x" ? i : 0;
-        yOffset = alignment === "y" ? i : 0;
-        if (ship.isHit({ x: xCoord + xOffset, y: yCoord - yOffset })) {
-          noShipCollisions = false;
-        }
-      }
-    }
-    return isWithInBorders && noShipCollisions;
   }
 }

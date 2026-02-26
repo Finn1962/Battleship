@@ -7,7 +7,6 @@ export class Ai {
   #targetMemory = {
     hitCoords: [],
     usedOffsets: [],
-    reachedEndOfShip: false,
     alignment: null,
   };
   #POSSIBLE_OFFSETS = Object.freeze([
@@ -27,7 +26,7 @@ export class Ai {
   takeAShotAt(enemy, coords) {
     switch (this.#currentState) {
       case this.#STATES.noPositionKnown:
-        this.#randomShotAt(enemy, coords);
+        this.#randomShot(enemy, coords);
         break;
       case this.#STATES.onePositionKnown:
         this.#findNextHit(enemy);
@@ -41,7 +40,7 @@ export class Ai {
     }
   }
 
-  #randomShotAt(
+  #randomShot(
     enemy,
     coord = {
       x: Math.floor(Math.random() * 10),
@@ -49,13 +48,16 @@ export class Ai {
     },
   ) {
     const coordString = `${coord.x},${coord.y}`;
-    if (this.#usedCoords.has(coordString)) return this.#randomShotAt(enemy);
+    if (this.#usedCoords.has(coordString)) return this.#randomShot(enemy);
+    this.#usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack(coord);
-    if (result.hit) {
+    if (result.shipIsSunk) {
+      this.#resetState();
+    } else if (result.hit) {
       this.#targetMemory.hitCoords.push(coord);
       this.#currentState = this.#STATES.onePositionKnown;
-    }
-    this.#usedCoords.add(coordString);
+      return;
+    } else this.#currentState = this.#STATES.noPositionKnown;
   }
 
   #findNextHit(enemy) {
@@ -64,40 +66,52 @@ export class Ai {
     );
     const offset = this.#POSSIBLE_OFFSETS[randomIndex];
     const offsetString = `${offset.x},${offset.y}`;
+    if (
+      this.#targetMemory.usedOffsets.length === this.#POSSIBLE_OFFSETS.length
+    ) {
+      this.#resetState();
+      return this.#randomShot(enemy);
+    }
     if (this.#targetMemory.usedOffsets.includes(offsetString))
       return this.#findNextHit(enemy);
     this.#targetMemory.usedOffsets.push(offsetString);
     const lastHit = this.#targetMemory.hitCoords[0];
     const nextXCoord = lastHit.x + offset.x;
     const nextYCoord = lastHit.y + offset.y;
-    if (!this.#coordIsValid({ x: nextXCoord, y: nextYCoord }))
+    const coordString = `${nextXCoord},${nextYCoord}`;
+    if (
+      !this.#coordIsValid({ x: nextXCoord, y: nextYCoord }) ||
+      this.#usedCoords.has(coordString)
+    )
       return this.#findNextHit(enemy);
-    //Hier prüfen ob die Coordinaten an den Seiten schonmal getroffen wurden !!!!!!!
+    this.#usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,
     });
     if (result.shipIsSunk) {
       this.#resetState();
-    }
-    if (result.hit) {
+    } else if (result.hit) {
       this.#currentState = this.#STATES.moreThanOnePositionKnown;
       this.#targetMemory.hitCoords.push({
         x: nextXCoord,
         y: nextYCoord,
       });
-      const [firstCoord, secondCoord] = this.#targetMemory.hitCoords;
-      if (firstCoord.x === secondCoord.x) this.#targetMemory.alignment = "y";
-      else this.#targetMemory.alignment = "x";
+      if (this.#targetMemory.hitCoords.length === 2) {
+        const [firstCoord, secondCoord] = this.#targetMemory.hitCoords;
+        if (firstCoord.x === secondCoord.x) this.#targetMemory.alignment = "y";
+        else this.#targetMemory.alignment = "x";
+      }
+    } else {
+      this.#currentState = this.#STATES.onePositionKnown;
     }
-    const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.#usedCoords.add(nextCoordString);
   }
 
   #findRemainingHits(enemy) {
     let furthestKnownHit = this.#targetMemory.hitCoords[0];
     let nextXCoord;
     let nextYCoord;
+
     if (this.#targetMemory.alignment === "x") {
       for (const hit of this.#targetMemory.hitCoords)
         if (furthestKnownHit.x < hit.x) furthestKnownHit = hit;
@@ -109,10 +123,15 @@ export class Ai {
       nextXCoord = furthestKnownHit.x;
       nextYCoord = furthestKnownHit.y - 1;
     }
-    if (!this.#coordIsValid({ x: nextXCoord, y: nextYCoord })) {
+    const coordString = `${nextXCoord},${nextYCoord}`;
+    if (
+      !this.#coordIsValid({ x: nextXCoord, y: nextYCoord }) ||
+      this.#usedCoords.has(coordString)
+    ) {
       this.#currentState = this.#STATES.endOfShipReached;
-      return;
+      return this.#findRemainingHitsAtOtherSide(enemy);
     }
+    this.#usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,
@@ -127,8 +146,6 @@ export class Ai {
     } else {
       this.#currentState = this.#STATES.endOfShipReached;
     }
-    const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.#usedCoords.add(nextCoordString);
   }
 
   #findRemainingHitsAtOtherSide(enemy) {
@@ -146,6 +163,13 @@ export class Ai {
       nextXCoord = furthestKnownHit.x;
       nextYCoord = furthestKnownHit.y + 1;
     }
+    const coordString = `${nextXCoord},${nextYCoord}`;
+    if (this.#usedCoords.has(coordString)) {
+      this.#resetState();
+      return this.#randomShot(enemy);
+    }
+    this.#usedCoords.add(coordString);
+
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,
@@ -158,10 +182,8 @@ export class Ai {
         y: nextYCoord,
       });
     } else {
-      this.#currentState = this.#STATES.endOfShipReached;
+      this.#currentState = this.#STATES.noPositionKnown;
     }
-    const nextCoordString = `${nextXCoord},${nextYCoord}`;
-    this.#usedCoords.add(nextCoordString);
   }
 
   #resetState() {
