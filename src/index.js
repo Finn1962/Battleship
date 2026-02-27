@@ -1,11 +1,13 @@
 import "./DOMController/background-image-randomizer.js";
+import { Names } from "./DOMController/name-seter.js";
 import { Player } from "./player/player.js";
 import { Ai } from "./ai/ai.js";
-import { Transitions } from "./DOMController/transitions.js";
+import { Transitions } from "./DOMController/transitions-manager.js";
 import { initFieldsInDom } from "./DOMController/playing-fields-generator.js";
-import { Dom } from "./DOMController/bord-controler.js";
+import { Board } from "./DOMController/bord-controler.js";
 import { initHoverTracker } from "./DOMController/hovered-field-tracker.js";
 import { hovered } from "./DOMController/hovered-field-tracker.js";
+import { updateScoreDisplay } from "./DOMController/score-display-controler.js";
 
 import "./main.css";
 
@@ -20,15 +22,16 @@ const usableShipLengths = Object.freeze([5, 4, 3, 3, 2]);
 let currentShipLength;
 const ai = new Ai();
 const player = new Player();
-Dom.internalPlayer = player; //Zum anzeigen von Kolisionen beim Platzieren von Schiffen benötigt
+Board.internalPlayer = player; //Zum anzeigen von Kolisionen beim Platzieren von Schiffen benötigt
+
+const startGame = new CustomEvent("startGame");
+const endGame = new CustomEvent("endGame");
 
 const wait = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 const waitForClick = () =>
   new Promise((resolve) =>
     DOM_ELEMENTS.uiBoardPlayer.addEventListener("click", () => resolve()),
   );
-
-const startGame = new CustomEvent("startGame");
 
 //Schiffe für Ai platzieren
 for (const length of usableShipLengths) {
@@ -64,21 +67,21 @@ DOM_ELEMENTS.startButton.addEventListener("click", () => {
   Transitions.placeShips();
   initFieldsInDom();
   initHoverTracker();
-  Dom.initMouseOverHandler();
+  Board.initMouseOverHandler();
 });
 
 //Bei Klick auf alignmentbutton ausrichtung ändern
 DOM_ELEMENTS.alignmentButton.addEventListener("click", () => {
   if (currentAlignment === "x") currentAlignment = "y";
   else currentAlignment = "x";
-  Dom.colorHoveredFields(currentShipLength, currentAlignment);
+  Board.colorHoveredFields(currentShipLength, currentAlignment);
 });
 
 //Schiffe für Spieler platzieren
 DOM_ELEMENTS.startButton.addEventListener("click", async () => {
   for (const length of usableShipLengths) {
     currentShipLength = length;
-    Dom.colorHoveredFields(length, currentAlignment);
+    Board.colorHoveredFields(length, currentAlignment);
     let shipPlaced = false;
     while (!shipPlaced) {
       await waitForClick();
@@ -89,21 +92,26 @@ DOM_ELEMENTS.startButton.addEventListener("click", async () => {
       };
       if (
         player.gameboard.coordinateIsValid(shipData) &&
-        player.gameboard.coordIsCollsionFree(shipData)
+        player.gameboard.coordIsCollsionFree(shipData) &&
+        hovered.coordPlayer.x !== null &&
+        hovered.coordPlayer.y !== null
       ) {
         player.gameboard.placeShip(shipData);
         shipPlaced = true;
       }
     }
-    Dom.updateBoard(player);
+    Board.updateBoard(player);
   }
-  Dom.stopColorFields();
+  Board.stopColorFields();
   document.dispatchEvent(startGame);
 });
 
 //Übergang zum Spiel
 document.addEventListener("startGame", () => {
   Transitions.startGame();
+  updateScoreDisplay(player);
+  updateScoreDisplay(ai);
+  Names.displayNames(player, ai);
 });
 
 //Ablauf während des Spieles
@@ -113,13 +121,22 @@ document.addEventListener("startGame", async () => {
     while (!shotIsValid) {
       shotIsValid = player.takeAShotAt(ai, await player.aimedCoord());
     }
-    Dom.updateBoard(ai);
+    Board.updateBoard(ai);
+    updateScoreDisplay(ai);
     if (ai.gameboard.allShipsSunk()) break;
     ai.takeAShotAt(player);
     await wait(250);
-    Dom.updateBoard(player);
+    Board.updateBoard(player);
+    updateScoreDisplay(player);
     if (player.gameboard.allShipsSunk()) {
       break;
     }
   }
+  document.dispatchEvent(endGame);
+});
+
+//Übergang zum Gewinnerscreen
+document.addEventListener("endGame", () => {
+  Transitions.winnerScreen();
+  Names.displayWinnerName(player, ai);
 });

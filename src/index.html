@@ -13,27 +13,36 @@
       <button id="start_button">START GAME</button>
     </div>
 
+    <div class="end-container" id="end_container">
+      <p id="winner_name">You Did Win!</p>
+      <p id="message"></p>
+      <button>PLAY AGAIN</button>
+    </div>
+
     <div class="game-container" id="game_container">
       <button class="rotate-button" id="alignment_button">ALIGNMENT</button>
       <div class="points-display" id="points_display_player">
-        <p>YOU</p>
-        <p>REMAINING SHIPS:</p>
-        <p id="remaining_ships_player">0</p>
-        <p>SUNK SHIPS:</p>
-        <p id="sunk_ships_player">0</p>
+        <!--Dynamisch in ai-name-randomizer.js erstellt-->
+        <p id="player_name">YOU</p>
+        <!--Dynamisch in score-display-controler.js erstellt-->
+        <p id="remaining_ships_player">REMAINING SHIPS: 0</p>
+        <!--Dynamisch in score-display-controler.js erstellt-->
+        <p id="sunk_ships_player">SUNK SHIPS: 0</p>
       </div>
       <div class="points-display" id="points_display_ai">
-        <p>ENEMY</p>
-        <p>REMAINING SHIPS:</p>
-        <p id="remaining_ships_ai">0</p>
-        <p>SUNK SHIPS:</p>
-        <p id="sunk_ships_ai">0</p>
+        <!--Dynamisch in ai-name-randomizer.js erstellt-->
+        <p id="ai_name">ENEMY</p>
+        <!--Dynamisch in score-display-controler.js erstellt-->
+        <p id="remaining_ships_ai">REMAINING SHIPS: 0</p>
+        <!--Dynamisch in score-display-controler.js erstellt-->
+        <p id="sunk_ships_ai">SUNK SHIPS: 0</p>
       </div>
       <div class="game-board" id="game_board_player"></div>
       <div class="game-board" id="game_board_ai"></div>
     </div>
 
     <div class="overlay" id="overlay"></div>
+    <!--Dynamisch in background-image-randomizer.js erstellt-->
     <img class="background-image" id="background_image" draggable="false" />
   </body>
 </html>

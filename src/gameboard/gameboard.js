@@ -20,6 +20,7 @@ export class Gameboard {
       if (ship.isHit(coordinate)) {
         this.reseivedHits.push({ coord: coordinate, isShipHit: true });
         ship.hit();
+        if (ship.isSunk()) this.remainingShips--;
         return { hit: true, shipIsSunk: ship.isSunk() };
       }
     }

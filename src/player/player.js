@@ -5,13 +5,13 @@ export class Player {
   name;
   #usedCoords = new Set();
   gameboard = new Gameboard();
-  remainingShips;
-  sunkShips;
+  sunkShips = 0;
   role = "player";
 
   takeAShotAt(enemy, coord) {
     if (this.#usedCoords.has(`${coord.x},${coord.y}`)) return false;
-    enemy.gameboard.receiveAttack(coord);
+    const result = enemy.gameboard.receiveAttack(coord);
+    if (result.shipIsSunk) this.sunkShips++;
     this.#usedCoords.add(`${coord.x},${coord.y}`);
     return true;
   }

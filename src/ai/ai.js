@@ -1,10 +1,18 @@
 import { Gameboard } from "../gameboard/gameboard";
 
 export class Ai {
+  availableNames = Object.freeze([
+    "Admiral Ironwave",
+    "Captain Blackcurrent",
+    "Commodore Steelfin",
+    "Rear Admiral Darkwater",
+    "Captain Vortex",
+  ]);
+  randomIndex = Math.floor(Math.random() * this.availableNames.length);
+  name = this.availableNames[this.randomIndex];
   gameboard = new Gameboard();
   role = "ai";
-  remainingShips;
-  sunkShips;
+  sunkShips = 0;
   #usedCoords = new Set();
   #targetMemory = {
     hitCoords: [],
@@ -54,6 +62,7 @@ export class Ai {
     this.#usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack(coord);
     if (result.shipIsSunk) {
+      this.sunkShips++;
       this.#resetState();
     } else if (result.hit) {
       this.#targetMemory.hitCoords.push(coord);
@@ -92,6 +101,7 @@ export class Ai {
       y: nextYCoord,
     });
     if (result.shipIsSunk) {
+      this.sunkShips++;
       this.#resetState();
     } else if (result.hit) {
       this.#currentState = this.#STATES.moreThanOnePositionKnown;
@@ -139,6 +149,7 @@ export class Ai {
       y: nextYCoord,
     });
     if (result.shipIsSunk) {
+      this.sunkShips++;
       this.#resetState();
     } else if (result.hit) {
       this.#targetMemory.hitCoords.push({
@@ -177,6 +188,7 @@ export class Ai {
       y: nextYCoord,
     });
     if (result.shipIsSunk) {
+      this.sunkShips++;
       this.#resetState();
     } else if (result.hit) {
       this.#targetMemory.hitCoords.push({

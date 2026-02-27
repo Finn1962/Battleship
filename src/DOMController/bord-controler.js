@@ -1,6 +1,6 @@
 import { hovered } from "./hovered-field-tracker.js";
 
-export class Dom {
+export class Board {
   static #mouseOverData = {
     coloringActive: false,
     shipLength: null,
@@ -55,23 +55,34 @@ export class Dom {
   static #hoveredCoordIsValid() {
     let isWithInGameboard = true;
     let noShipCollisions = true;
+    const shipCoordsToValidate = [];
     const { alignment, shipLength } = this.#mouseOverData;
-    let xOffset = alignment === "x" ? shipLength - 1 : 0;
-    let yOffset = alignment === "y" ? shipLength - 1 : 0;
+
+    for (let i = 0; i < shipLength; i++) {
+      let xOffset = alignment === "x" ? i : 0;
+      let yOffset = alignment === "y" ? -i : 0;
+      shipCoordsToValidate.push({
+        x: hovered.coordPlayer.x + xOffset,
+        y: hovered.coordPlayer.y + yOffset,
+      });
+    }
+
+    const lastIndex = shipCoordsToValidate.length - 1;
+    const firstCoord = shipCoordsToValidate[0];
+    const lastCoord = shipCoordsToValidate[lastIndex];
     const boardSize = { min: 0, max: 9 };
     if (
-      hovered.coordPlayer.x + xOffset > boardSize.max ||
-      hovered.coordPlayer.y - yOffset < boardSize.min
+      firstCoord.x < boardSize.min ||
+      lastCoord.y < boardSize.min ||
+      lastCoord.x > boardSize.max ||
+      firstCoord.y > boardSize.max
     )
       isWithInGameboard = false;
 
     const internalBoard = this.internalPlayer.gameboard;
-    const { x: xCoord, y: yCoord } = hovered.coordPlayer;
     for (const ship of internalBoard.placedShips) {
-      for (let i = 0; i < ship.length - 1; i++) {
-        xOffset = alignment === "x" ? i : 0;
-        yOffset = alignment === "y" ? i : 0;
-        if (ship.isHit({ x: xCoord + xOffset, y: yCoord - yOffset })) {
+      for (const coord of shipCoordsToValidate) {
+        if (ship.isHit({ x: coord.x, y: coord.y })) {
           noShipCollisions = false;
         }
       }
@@ -85,6 +96,7 @@ export class Dom {
       opponent.role === "player"
         ? document.getElementById("game_board_player")
         : document.getElementById("game_board_ai");
+
     for (const hit of internalBoard.reseivedHits) {
       const dot = document.createElement("div");
       if (hit.isShipHit) dot.classList.add("red-dot");
@@ -95,6 +107,7 @@ export class Dom {
       uiField.replaceChildren();
       uiField.append(dot);
     }
+
     for (const ship of internalBoard.placedShips) {
       if (ship.alignment === "x") {
         for (let i = 0; i < ship.length; i++) {
