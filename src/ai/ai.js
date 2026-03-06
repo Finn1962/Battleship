@@ -8,12 +8,12 @@ export class Ai {
     "Rear Admiral Darkwater",
     "Captain Vortex",
   ]);
-  randomIndex = Math.floor(Math.random() * this.availableNames.length);
-  name = this.availableNames[this.randomIndex];
+  #randomIndex = Math.floor(Math.random() * this.availableNames.length);
+  name = this.availableNames[this.#randomIndex];
   gameboard = new Gameboard();
   role = "ai";
   sunkShips = 0;
-  #usedCoords = new Set();
+  usedCoords = new Set();
   #targetMemory = {
     hitCoords: [],
     usedOffsets: [],
@@ -58,8 +58,8 @@ export class Ai {
     },
   ) {
     const coordString = `${coord.x},${coord.y}`;
-    if (this.#usedCoords.has(coordString)) return this.#randomShot(enemy);
-    this.#usedCoords.add(coordString);
+    if (this.usedCoords.has(coordString)) return this.#randomShot(enemy);
+    this.usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack(coord);
     if (result.shipIsSunk) {
       this.sunkShips++;
@@ -92,10 +92,10 @@ export class Ai {
     const coordString = `${nextXCoord},${nextYCoord}`;
     if (
       !this.#coordIsValid({ x: nextXCoord, y: nextYCoord }) ||
-      this.#usedCoords.has(coordString)
+      this.usedCoords.has(coordString)
     )
       return this.#findNextHit(enemy);
-    this.#usedCoords.add(coordString);
+    this.usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,
@@ -138,12 +138,12 @@ export class Ai {
     const coordString = `${nextXCoord},${nextYCoord}`;
     if (
       !this.#coordIsValid({ x: nextXCoord, y: nextYCoord }) ||
-      this.#usedCoords.has(coordString)
+      this.usedCoords.has(coordString)
     ) {
       this.#currentState = this.#STATES.endOfShipReached;
       return this.#findRemainingHitsAtOtherSide(enemy);
     }
-    this.#usedCoords.add(coordString);
+    this.usedCoords.add(coordString);
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,
       y: nextYCoord,
@@ -177,11 +177,11 @@ export class Ai {
       nextYCoord = furthestKnownHit.y + 1;
     }
     const coordString = `${nextXCoord},${nextYCoord}`;
-    if (this.#usedCoords.has(coordString)) {
+    if (this.usedCoords.has(coordString)) {
       this.#resetState();
       return this.#randomShot(enemy);
     }
-    this.#usedCoords.add(coordString);
+    this.usedCoords.add(coordString);
 
     const result = enemy.gameboard.receiveAttack({
       x: nextXCoord,

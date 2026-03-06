@@ -1,6 +1,6 @@
 import { hovered } from "./hovered-field-tracker.js";
 
-export class Board {
+export class UiBoard {
   static #mouseOverData = {
     coloringActive: false,
     shipLength: null,
@@ -90,7 +90,7 @@ export class Board {
     return isWithInGameboard && noShipCollisions;
   }
 
-  static updateBoard(opponent) {
+  static update(opponent) {
     const internalBoard = opponent.gameboard;
     const uiGameBoard =
       opponent.role === "player"
@@ -127,6 +127,22 @@ export class Board {
           else if (opponent.role === "player")
             uiField.style.backgroundColor = "white";
         }
+      }
+    }
+  }
+
+  static reset(opponent) {
+    const uiGameBoard =
+      opponent.role === "player"
+        ? document.getElementById("game_board_player")
+        : document.getElementById("game_board_ai");
+    for (let y = 0; y < 10; y++) {
+      for (let x = 0; x < 10; x++) {
+        const uiField = uiGameBoard.querySelector(
+          `[data-x="${x}"][data-y="${y}"]`,
+        );
+        uiField.replaceChildren();
+        uiField.style.backgroundColor = "transparent";
       }
     }
   }

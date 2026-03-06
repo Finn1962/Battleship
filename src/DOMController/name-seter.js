@@ -3,13 +3,13 @@ const playerName = document.getElementById("player_name");
 const winnerName = document.getElementById("winner_name");
 const message = document.getElementById("message");
 
-export class Names {
-  static displayNames(player, ai) {
+export class UiNames {
+  static showNames(player, ai) {
     playerName.textContent = player.name.toUpperCase();
     aiName.textContent = ai.name.toUpperCase();
   }
 
-  static displayWinnerName(player, ai) {
+  static showWinnerName(player, ai) {
     const winner = player.gameboard.allShipsSunk() ? ai : player;
     const nameOfWinner = winner === player ? player.name : ai.name;
 
