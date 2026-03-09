@@ -1,24 +1,26 @@
-import BackgroundOne from "../assets/Background_One.jpg";
-import BackgroundTwo from "../assets/Background_Two.jpg";
-import BackgroundThree from "../assets/Background_Three.jpg";
-import BackgroundFour from "../assets/Background_Four.jpg";
-import BackgroundFive from "../assets/Background_Five.jpg";
-import BackgroundSix from "../assets/Background_Six.jpg";
+import backgroundOne from "../assets/background_one.jpeg";
+import backgroundTwo from "../assets/background_two.jpeg";
+import backgroundThree from "../assets/background_three.jpeg";
+import backgroundFour from "../assets/background_four.jpeg";
+import backgroundFive from "../assets/background_five.jpeg";
+import backgroundSix from "../assets/background_six.jpeg";
+import backgroundSeven from "../assets/background_seven.jpeg";
+import backgroundEight from "../assets/background_eight.jpeg";
 
 const backgroundImage = document.getElementById("background_image");
 
 const availableImages = [
-  BackgroundOne,
-  BackgroundTwo,
-  BackgroundThree,
-  BackgroundFour,
-  BackgroundFive,
-  BackgroundSix,
+  backgroundOne,
+  backgroundTwo,
+  backgroundThree,
+  backgroundFour,
+  backgroundFive,
+  backgroundSix,
+  backgroundSeven,
+  backgroundEight,
 ];
 
-document.addEventListener("DOMContentLoaded", () => placeRandomBackground());
-
-function placeRandomBackground() {
+export function placeRandomBackground() {
   const randomIndex = Math.floor(Math.random() * availableImages.length);
   backgroundImage.src = availableImages[randomIndex];
 }

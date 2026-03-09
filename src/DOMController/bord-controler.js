@@ -8,16 +8,19 @@ export class UiBoard {
   };
   internalPlayer = null; //Wird später in Index zugewiesen sobald erstellt
 
+  //Befehl um Felder einzufärben
   static colorHoveredFields(shipLength, alignment) {
     this.#mouseOverData.coloringActive = true;
     this.#mouseOverData.shipLength = shipLength;
     this.#mouseOverData.alignment = alignment;
   }
 
+  //Befehl um Felder nicht mehr einzufärben
   static stopColorFields() {
     this.#mouseOverData.coloringActive = false;
   }
 
+  //Platziert eventlistener
   static initMouseOverHandler() {
     const uiBoardPlayer = document.getElementById("game_board_player");
     uiBoardPlayer.addEventListener("mouseover", () =>
@@ -28,6 +31,7 @@ export class UiBoard {
     );
   }
 
+  //Färbt felder bei auslösen der Eventlistener
   static #mouseOverHandler = (uiBoardPlayer, color) => {
     if (!this.#mouseOverData.coloringActive) return;
     const { x: xCoord, y: yCoord } = hovered.coordPlayer;
@@ -90,6 +94,7 @@ export class UiBoard {
     return isWithInGameboard && noShipCollisions;
   }
 
+  //Aktualisiert Spielfelder in Dom zur Visualisierung
   static update(opponent) {
     const internalBoard = opponent.gameboard;
     const uiGameBoard =
@@ -131,6 +136,7 @@ export class UiBoard {
     }
   }
 
+  //Setzt Spielfelder in Dom zurück
   static reset(opponent) {
     const uiGameBoard =
       opponent.role === "player"

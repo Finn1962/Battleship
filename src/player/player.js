@@ -1,11 +1,10 @@
-import { Gameboard } from "../gameboard/gameboard";
 import { hovered } from "../DOMController/hovered-field-tracker.js";
 
 export class Player {
   name;
-  usedCoords = new Set();
-  gameboard = new Gameboard();
-  sunkShips = 0;
+  usedCoords; //Hier wird bei Spielstart/Neustart ein neuer Set eingefügt von Index
+  gameboard; //Hier wird bei Spielstart/Neustart ein neues Gameboard eingefügt von Index
+  sunkShips; //Hier wird bei Spielstart/Neustart 0 eingefüt von Index
   role = "player";
 
   takeAShotAt(enemy, coord) {
@@ -20,8 +19,7 @@ export class Player {
     return new Promise((resolve) => {
       document.addEventListener("click", handler);
       function handler() {
-        //Bricht ab wenn keine Kordinate bei Ki-Spielfeld angehoverd wird
-        if (hovered.coordAi.x === null || hovered.coordAi.y === null) return;
+        if (hovered.coordAi.x === null || hovered.coordAi.y === null) return; //Bricht ab wenn keine Kordinate bei Ki-Spielfeld angehoverd wird
         document.removeEventListener("click", handler);
         resolve(hovered.coordAi);
       }

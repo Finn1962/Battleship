@@ -1,13 +1,14 @@
-import "./DOMController/background-image-randomizer.js";
+import { placeRandomBackground } from "./DOMController/background-image-randomizer.js";
 import { UiNames } from "./DOMController/name-seter.js";
 import { Player } from "./player/player.js";
 import { Ai } from "./ai/ai.js";
-import { UiTransitions } from "./DOMController/transitions-manager.js";
+import { UiTransitions } from "./DOMController/transitions-controler.js";
 import { initFieldsInDom } from "./DOMController/playing-fields-generator.js";
 import { UiBoard } from "./DOMController/bord-controler.js";
 import { initHoverTracker } from "./DOMController/hovered-field-tracker.js";
 import { hovered } from "./DOMController/hovered-field-tracker.js";
 import { updateScoreDisplay } from "./DOMController/score-display-controler.js";
+import { Gameboard } from "./gameboard/gameboard.js";
 
 import "./main.css";
 
@@ -44,14 +45,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.dispatchEvent(newGame);
 });
 
-//Memorie, platzierte Schiffe und Ui-Spielfeld zurücksetzen
+//Memorie und Spielfelder zurücksetzen und Zufallshintergrund Setzen
 document.addEventListener("newGame", () => {
-  memorie.alignment = "x";
+  placeRandomBackground();
+  memorie.currentAlignment = "x";
   memorie.currentShipLength = null;
-  player.gameboard.placedShips = [];
-  ai.gameboard.placedShips = [];
-  player.gameboard.reseivedHits = [];
-  ai.gameboard.reseivedHits = [];
+  player.sunkShips = 0;
+  ai.sunkShips = 0;
+  player.gameboard = new Gameboard();
+  ai.gameboard = new Gameboard();
   player.usedCoords = new Set();
   ai.usedCoords = new Set();
 });

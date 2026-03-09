@@ -11,6 +11,7 @@ const pointsDisplays = gameContainer.querySelectorAll(".points-display");
 const alignmentButton = document.getElementById("alignment_button");
 
 export class UiTransitions {
+  //Transition für erste Phase, wo Spieler Schiffe platziert
   static placeShips() {
     alignmentButton.style.display = "block";
     logo.style.height = "120px";
@@ -26,6 +27,7 @@ export class UiTransitions {
     overlay.style.opacity = "0.5";
   }
 
+  //Transition für zweite Phase, wo Spieler spiel Spielt
   static startGame() {
     alignmentButton.style.display = "none";
     aiBoard.style.display = "grid";
@@ -35,14 +37,19 @@ export class UiTransitions {
     });
   }
 
+  //Transition für dritte Phase, wo Gewinner angezeigt wird
   static winnerScreen() {
     gameContainer.style.display = "none";
     logo.style.height = "200px";
     endGameContainer.style.display = "flex";
   }
 
+  //Transition für fierte Phase wenn spieler noch mal Spielt
   static newGame() {
     endGameContainer.style.display = "none";
     splashScreenContainer.style.display = "flex";
+    backgroundImage.style.filter = "blur(0px)";
+    backgroundImage.style.transform = "scale(1)";
+    overlay.style.opacity = "0";
   }
 }

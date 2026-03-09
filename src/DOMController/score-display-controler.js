@@ -11,7 +11,6 @@ export function updateScoreDisplay(oponent) {
   remainingShips.textContent = `REMAINING SHIPS : ${oponent.gameboard.remainingShips}`;
   sunkShips.textContent = `SUNK SHIPS : ${oponent.sunkShips}`;
 
-  if (oponent.gameboard.remainingShips <= 1) {
-    remainingShips.style.color = "red";
-  }
+  if (oponent.gameboard.remainingShips <= 1) remainingShips.style.color = "red";
+  else remainingShips.style.color = "white";
 }

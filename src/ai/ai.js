@@ -1,5 +1,3 @@
-import { Gameboard } from "../gameboard/gameboard";
-
 export class Ai {
   availableNames = Object.freeze([
     "Admiral Ironwave",
@@ -10,10 +8,10 @@ export class Ai {
   ]);
   #randomIndex = Math.floor(Math.random() * this.availableNames.length);
   name = this.availableNames[this.#randomIndex];
-  gameboard = new Gameboard();
+  usedCoords; //Hier wird bei Spielstart/Neustart ein neuer Set eingefügt von Index
+  gameboard; //Hier wird bei Spielstart/Neustart ein neues Gameboard eingefügt von Index
+  sunkShips; //Hier wird bei Spielstart/Neustart 0 eingefüt von Index
   role = "ai";
-  sunkShips = 0;
-  usedCoords = new Set();
   #targetMemory = {
     hitCoords: [],
     usedOffsets: [],
@@ -33,6 +31,7 @@ export class Ai {
   });
   #currentState = this.#STATES.noPositionKnown;
 
+  //Wählt passende reaktion bassierend auf State aus
   takeAShotAt(enemy, coords) {
     switch (this.#currentState) {
       case this.#STATES.noPositionKnown:
@@ -50,6 +49,7 @@ export class Ai {
     }
   }
 
+  //Macht einen zufälligen Schuss
   #randomShot(
     enemy,
     coord = {
@@ -71,6 +71,7 @@ export class Ai {
     } else this.#currentState = this.#STATES.noPositionKnown;
   }
 
+  //Sucht einen zweiten treffer wenn einer bekannt ist
   #findNextHit(enemy) {
     const randomIndex = Math.floor(
       Math.random() * this.#POSSIBLE_OFFSETS.length,
@@ -119,6 +120,7 @@ export class Ai {
     }
   }
 
+  //Sucht die restlichen treffer in eine Richtung wenn zwei bekannt sind
   #findRemainingHits(enemy) {
     let furthestKnownHit = this.#targetMemory.hitCoords[0];
     let nextXCoord;
@@ -161,6 +163,7 @@ export class Ai {
     }
   }
 
+  //Sucht die restlichen treffer in die andere Richtung wenn ende von Schiff erreicht
   #findRemainingHitsAtOtherSide(enemy) {
     let furthestKnownHit = this.#targetMemory.hitCoords[0];
     let nextXCoord;

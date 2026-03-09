@@ -36,6 +36,15 @@
   }
 }
 
+@keyframes scale {
+  from {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 @keyframes shake {
   0%,
   100% {
@@ -236,6 +245,7 @@ button:hover {
 }
 
 .background-image {
+  animation: scale var(--transition-speed);
   transition:
     filter var(--transition-speed),
     transform var(--transition-speed);
@@ -266,9 +276,5 @@ button:hover {
 
 .end-container p:last-of-type {
   margin: 0 0 75px 0;
-  font-size: 2rem;
-}
-
-#message {
-  font-size: 2.5rem;
+  font-size: 4.5rem;
 }
